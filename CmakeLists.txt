@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 3.10)
+project(DescendingOrderTests)
+
+# Opcjonalna flaga do włączenia GTest
+option(USE_GTEST "Use GoogleTest instead of mini-framework" OFF)
+
+# Plik źródłowy z funkcją i testami
+set(SOURCES test_descending_order.cpp)
+
+# Jeżeli GTest, dołącz bibliotekę
+if(USE_GTEST)
+    message(STATUS "Building with GoogleTest")
+    add_definitions(-DRUN_GTESTS)
+
+    # Pobierz GoogleTest (jeśli nie masz lokalnie)
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/heads/main.zip
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    enable_testing()
+    add_executable(test_gtest ${SOURCES})
+    target_link_libraries(test_gtest gtest_main)
+    include(GoogleTest)
+    gtest_discover_tests(test_gtest)
+
+else()
+    message(STATUS "Building with mini-framework")
+    add_executable(test_mini ${SOURCES})
+endif()
